@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Result Portal</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5fb;
+            color: #1e3354;
+        }
+
+        header {
+            background: #243b5a;
+            color: white;
+            padding: 22px 8%;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        main {
+            max-width: 950px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+
+        .auth-box,
+        .search-box,
+        .result-box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px #00000010;
+        }
+
+        .auth-box {
+            max-width: 440px;
+            margin: 40px auto;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 7px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            min-width: 0;
+            padding: 13px;
+            border: 1px solid #ccd7e8;
+            border-radius: 7px;
+            font-size: 16px;
+        }
+
+        button {
+            background: #2165ed;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            padding: 13px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #174fc4;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .full-button {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .link-button {
+            color: #2165ed;
+            background: none;
+            padding: 5px;
+        }
+
+        .link-button:hover {
+            background: #edf4ff;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        #message,
+        .auth-message {
+            margin-top: 15px;
+            color: #c0392b;
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            background: #f1f6ff;
+            padding: 18px;
+            border-radius: 8px;
+        }
+
+        .student-info p {
+            margin: 5px 0;
+        }
+
+        .status {
+            font-weight: bold;
+            color: #07864c;
+        }
+
+        .fail {
+            color: #dc2626;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            margin-top: 22px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th,
+        td {
+            padding: 13px;
+            text-align: left;
+            border: 1px solid #e0e7f0;
+        }
+
+        th {
+            background: #eaf1fc;
+        }
+
+        .summary {
+            margin-top: 22px;
+            padding: 18px;
+            background: #edf4ff;
+            border-radius: 8px;
+            line-height: 1.9;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #243b5a;
+            color: white;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        @media (max-width: 600px) {
+            main {
+                margin: 15px auto;
+                padding: 12px;
+            }
+
+            .search-row {
+                flex-direction: column;
+            }
+
+            .student-info {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 18px;
+                font-size: 19px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <span>🎓 Student Result Portal</span>
+        <button id="logoutBtn" hidden>Logout</button>
+    </header>
+
+    <main>
+
+        <!-- PAGE 1: LOGIN -->
+        <section class="auth-box" id="loginPage">
+            <h2>Welcome Back!</h2>
+            <p>Login to check your result.</p>
+
+            <form id="loginForm">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" placeholder="Enter your email" autocomplete="email" required>
+
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password"
+                    autocomplete="current-password" required>
+
+                <button class="full-button" type="submit" id="loginBtn">
+                    Login
+                </button>
+            </form>
+
+            <p class="auth-message" id="loginMessage" role="status"></p>
+
+            <p>
+                Don't have an account?
+                <button class="link-button" id="showRegister" type="button">
+                    Create Account
+                </button>
+            </p>
+        </section>
+
+
+        <!-- PAGE 2: CREATE ACCOUNT -->
+        <section class="auth-box" id="registerPage" hidden>
+            <h2>Create Account</h2>
+            <p>Create your account to continue.</p>
+
+            <form id="registerForm">
+                <label for="registerName">Full Name</label>
+                <input type="text" id="registerName" placeholder="Enter your name" autocomplete="name" required>
+
+                <label for="registerEmail">Email</label>
+                <input type="email" id="registerEmail" placeholder="Enter your email" autocomplete="email" required>
+
+                <label for="registerPassword">Password</label>
+                <input type="password" id="registerPassword" placeholder="Create a password" minlength="8"
+                    autocomplete="new-password" required>
+
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" placeholder="Enter password again" minlength="8"
+                    autocomplete="new-password" required>
+
+                <button class="full-button" type="submit" id="registerBtn">
+                    Create Account
+                </button>
+            </form>
+
+            <p class="auth-message" id="registerMessage" role="status"></p>
+
+            <p>
+                Already have an account?
+                <button class="link-button" id="showLogin" type="button">
+                    Login
+                </button>
+            </p>
+        </section>
+
+
+        <!-- PAGE 3: RESULT SEARCH -->
+        <section id="resultPage" hidden>
+
+            <section class="search-box">
+                <h2>Check Your Result</h2>
+                <p>Enter your roll number to view your result.</p>
+
+                <form id="resultForm">
+                    <div class="search-row">
+                        <input type="number" id="rollNo" placeholder="Enter Roll Number (e.g. 1001)" min="1" required>
+
+                        <button type="submit" id="searchBtn">
+                            Get Result
+                        </button>
+                    </div>
+                </form>
+
+                <p id="message" role="status"></p>
+            </section>
+
+            <section class="result-box" id="resultBox" hidden>
+                <h2>STUDENT RESULT</h2>
+
+                <p>
+                    Overall Result:
+                    <span id="overall" class="status"></span>
+                </p>
+
+                <div class="student-info">
+                    <p>Roll No: <strong id="roll"></strong></p>
+                    <p>Name: <strong id="name"></strong></p>
+                    <p>Father Name: <strong id="father"></strong></p>
+                    <p>Mother Name: <strong id="mother"></strong></p>
+                    <p>School: <strong id="school"></strong></p>
+                    <p>District: <strong id="district"></strong></p>
+                    <p>Academic Year: <strong id="year"></strong></p>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Subject</th>
+                                <th>Marks</th>
+                                <th>Total Marks</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marksBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="summary">
+                    <strong>Total Marks:</strong>
+                    <span id="total"></span>
+                    <br>
+
+                    <strong>Percentage:</strong>
+                    <span id="percentage"></span>%
+                    <br>
+
+                    <strong>Overall Result:</strong>
+                    <span id="summaryResult"></span>
+                </div>
+            </section>
+
+        </section>
+
+    </main>
+
+    <footer>Student Result Portal | Practice Project</footer>
+
+    <script>
+        const API = "http://127.0.0.1:8000";
+
+        const loginPage = document.getElementById("loginPage");
+        const registerPage = document.getElementById("registerPage");
+        const resultPage = document.getElementById("resultPage");
+        const logoutBtn = document.getElementById("logoutBtn");
+
+        // Switch between pages
+        function showPage(page) {
+            loginPage.hidden = page !== "login";
+            registerPage.hidden = page !== "register";
+            resultPage.hidden = page !== "result";
+            logoutBtn.hidden = page !== "result";
+        }
+
+        // Safely read JSON responses
+        async function readResponse(response) {
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    typeof data.detail === "string"
+                        ? data.detail
+                        : "Request failed. Please try again."
+                );
+            }
+
+            return data;
+        }
+
+        // Show login or register page
+        document.getElementById("showRegister").addEventListener(
+            "click", function () {
+                document.getElementById("registerMessage").textContent = "";
+                showPage("register");
+            }
+        );
+
+        document.getElementById("showLogin").addEventListener(
+            "click", function () {
+                document.getElementById("loginMessage").textContent = "";
+                showPage("login");
+            }
+        );
+
+        // CREATE ACCOUNT
+        document.getElementById("registerForm").addEventListener(
+            "submit", async function (event) {
+                event.preventDefault();
+
+                const name = document.getElementById("registerName").value.trim();
+                const email = document.getElementById("registerEmail").value.trim();
+                const password = document.getElementById("registerPassword").value;
+                const confirmPassword =
+                    document.getElementById("confirmPassword").value;
+                const message = document.getElementById("registerMessage");
+                const button = document.getElementById("registerBtn");
+
+                message.textContent = "";
+
+                if (password !== confirmPassword) {
+                    message.textContent = "Passwords do not match.";
+                    return;
+                }
+
+                button.disabled = true;
+                button.textContent = "Creating account...";
+
+                try {
+                    const response = await fetch(`${API}/auth/register`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            name: name,
+                            email: email,
+                            password: password
+                        })
+                    });
+
+                    await readResponse(response);
+
+                    document.getElementById("loginEmail").value = email;
+                    document.getElementById("loginMessage").textContent =
+                        "Account created. Please login.";
+
+                    document.getElementById("registerForm").reset();
+                    showPage("login");
+
+                } catch (error) {
+                    message.textContent =
+                        error.message === "Failed to fetch"
+                            ? "Backend is not running or the registration API is unavailable."
+                            : error.message;
+                } finally {
+                    button.disabled = false;
+                    button.textContent = "Create Account";
+                }
+            }
+        );
+
+        // LOGIN
+        document.getElementById("loginForm").addEventListener(
+            "submit", async function (event) {
+                event.preventDefault();
+
+                const email = document.getElementById("loginEmail").value.trim();
+                const password = document.getElementById("loginPassword").value;
+                const message = document.getElementById("loginMessage");
+                const button = document.getElementById("loginBtn");
+
+                message.textContent = "";
+                button.disabled = true;
+                button.textContent = "Logging in...";
+
+                try {
+                    const response = await fetch(`${API}/auth/login`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            email: email,
+                            password: password
+                        })
+                    });
+
+                    const data = await readResponse(response);
+
+                    if (!data.access_token) {
+                        throw new Error(
+                            "Login API did not return an access token."
+                        );
+                    }
+
+                    // Keep token for this browser session
+                    sessionStorage.setItem("access_token", data.access_token);
+
+                    document.getElementById("loginForm").reset();
+                    document.getElementById("message").textContent = "";
+                    document.getElementById("resultBox").hidden = true;
+
+                    showPage("result");
+
+                } catch (error) {
+                    message.textContent =
+                        error.message === "Failed to fetch"
+                            ? "Backend is not running or the login API is unavailable."
+                            : error.message;
+                } finally {
+                    button.disabled = false;
+                    button.textContent = "Login";
+                }
+            }
+        );
+
+        // LOGOUT
+        logoutBtn.addEventListener("click", function () {
+            sessionStorage.removeItem("access_token");
+            document.getElementById("resultForm").reset();
+            document.getElementById("message").textContent = "";
+            document.getElementById("resultBox").hidden = true;
+            showPage("login");
+        });
+
+        // CHECK STUDENT RESULT
+        document.getElementById("resultForm").addEventListener(
+            "submit", async function (event) {
+                event.preventDefault();
+
+                const rollNo = document.getElementById("rollNo").value.trim();
+                const message = document.getElementById("message");
+                const resultBox = document.getElementById("resultBox");
+                const searchBtn = document.getElementById("searchBtn");
+                const token = sessionStorage.getItem("access_token");
+
+                resultBox.hidden = true;
+                message.textContent = "";
+
+                if (!token) {
+                    showPage("login");
+                    message.textContent = "Please login first.";
+                    return;
+                }
+
+                if (!rollNo || Number(rollNo) <= 0) {
+                    message.textContent = "Please enter a valid roll number.";
+                    return;
+                }
+
+                searchBtn.disabled = true;
+                searchBtn.textContent = "Searching...";
+
+                try {
+                    const response = await fetch(
+                        `${API}/result/${encodeURIComponent(rollNo)}`,
+                        {
+                            headers: {
+                                "Authorization": `Bearer ${token}`
+                            }
+                        }
+                    );
+
+                    const data = await readResponse(response);
+
+                    // Display student information
+                    document.getElementById("roll").textContent = data.roll_no;
+                    document.getElementById("name").textContent = data.name;
+                    document.getElementById("father").textContent = data.father_name;
+                    document.getElementById("mother").textContent = data.mother_name;
+                    document.getElementById("school").textContent = data.school_name;
+                    document.getElementById("district").textContent = data.district;
+                    document.getElementById("year").textContent = data.academic_year;
+
+                    // Display subject marks
+                    const tbody = document.getElementById("marksBody");
+                    tbody.replaceChildren();
+
+                    data.subjects.forEach(function (subject, index) {
+                        const tr = document.createElement("tr");
+
+                        const values = [
+                            index + 1,
+                            subject.subject_name,
+                            subject.marks,
+                            subject.total_marks,
+                            subject.status
+                        ];
+
+                        values.forEach(function (value, i) {
+                            const td = document.createElement("td");
+                            td.textContent = value;
+
+                            if (i === 4 && value === "FAIL") {
+                                td.className = "fail";
+                            }
+
+                            tr.appendChild(td);
+                        });
+
+                        tbody.appendChild(tr);
+                    });
+
+                    // Display totals
+                    document.getElementById("total").textContent =
+                        `${data.total_obtained} / ${data.total_marks}`;
+
+                    document.getElementById("percentage").textContent =
+                        data.percentage;
+
+                    document.getElementById("overall").textContent = data.result;
+                    document.getElementById("summaryResult").textContent = data.result;
+
+                    document.getElementById("overall").className =
+                        data.result === "FAIL" ? "status fail" : "status";
+
+                    resultBox.hidden = false;
+
+                } catch (error) {
+                    if (error.message === "Failed to fetch") {
+                        message.textContent =
+                            "Cannot connect to the backend. Check FastAPI and CORS.";
+                    } else if (error.message.toLowerCase().includes("token") ||
+                        error.message.toLowerCase().includes("credential")) {
+                        sessionStorage.removeItem("access_token");
+                        showPage("login");
+                        document.getElementById("loginMessage").textContent =
+                            "Your login session expired. Please login again.";
+                    } else {
+                        message.textContent = error.message;
+                    }
+                } finally {
+                    searchBtn.disabled = false;
+                    searchBtn.textContent = "Get Result";
+                }
+            }
+        );
+
+        // Always start on login page
+        // The token is not treated as proof that it is still valid.
+        showPage("login");
+    </script>
+
+</body>
+
+</html>
+
